@@ -24,6 +24,7 @@ const HeaderComponent = () => {
             </button>
           </nav>
       </header>
+      <br/>
     </div>
   );
 }
