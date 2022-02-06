@@ -37,7 +37,7 @@ class TaskService {
   }
 
   deleteAllCompleted() {
-    return axios.delete(TASK_API_URL + 'completed');
+    return axios.delete(TASK_API_URL + '/completed');
   }
 }
 

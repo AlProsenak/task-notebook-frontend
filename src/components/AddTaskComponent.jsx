@@ -55,7 +55,6 @@ const AddTaskComponent = () => {
             deadline: deadline,
             description: description
           });
-
           setSubmitted(true);
           console.log(response.data);
         })

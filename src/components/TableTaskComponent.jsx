@@ -9,16 +9,18 @@ const TableTaskComponent = () => {
   // STATES
   const [tasks, setTasks] = useState([]);
 
-  // Fetches tasks once on page refresh from the given API path.
+  // USE EFFECTS
   useEffect(() => {
-    getAllTasks();
+    fetchTaskList();
   }, [])
 
-  // FUNCTIONS
-  const getAllTasks = async () => {
+  // EVENT HANDLERS
+  const fetchTaskList = async () => {
     try {
       const response = await TaskService.getAll();
-      setTasks(response.data);
+      setTasks(response.data.sort(
+        (a, b) => (a.id - b.id)
+      ));
       console.log(response.data);
     } catch (error) {
       if (error.response) {
@@ -31,10 +33,42 @@ const TableTaskComponent = () => {
     }
   }
 
+  const handleToggleCompleted = async (task) => {
+    try {
+      (task.completed) ? (task.completed = false) : (task.completed = true);
+
+      await TaskService.updateById(task.id, task);
+      fetchTaskList();
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else {
+        console.log(`Error: ${error.message}`);
+      } 
+    }
+  }
+
   const deleteTask = async (id) => {
     try {
       await TaskService.deleteById(id);
-      getAllTasks();
+      fetchTaskList();
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else {
+        console.log(`Error: ${error.message}`);
+      } 
+    }
+  }
+
+  const handleDeleteCompleted = async () => {
+    try {
+      await TaskService.deleteAllCompleted();
+      fetchTaskList();
     } catch (error) {
       if (error.response) {
         console.log(error.response.data);
@@ -84,12 +118,15 @@ const TableTaskComponent = () => {
                 
                 <td>{task.description}</td>
                 <td>
-                  <button>Completed</button>
+                  <button
+                    onClick={() => handleToggleCompleted(task)}
+                  >{(task.completed) ? ("Undo") : ("Complete")}</button>
+                  
                   <button>Edit</button>
                   
-                  <button onClick={() => deleteTask(task.id)}>
-                    Delete
-                  </button>
+                  <button
+                    onClick={() => deleteTask(task.id)}
+                  >Delete</button>
                 </td>
               </tr>
             ))}
@@ -106,6 +143,8 @@ const TableTaskComponent = () => {
       <Link to="/task-add">
         <button>Add task</button>
       </Link>
+
+      <button onClick={handleDeleteCompleted}>Delete completed</button>
     </div>
   );
 }
