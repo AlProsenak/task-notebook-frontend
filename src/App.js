@@ -1,11 +1,12 @@
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 
+// STYLING 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 
 // COMPONENTS
 import AboutComponent from './components/AboutComponent';
-import CreateTaskComponent from './components/CreateTaskComponent';
+import AddTaskComponent from './components/AddTaskComponent';
 import ErrorComponent from './components/ErrorComponent';
 import HeaderComponent from './components/HeaderComponent';
 import TableTaskComponent from './components/TableTaskComponent';
@@ -20,7 +21,7 @@ function App() {
         <Switch>
           <Route exact path="/" children={<TableTaskComponent />} />
           <Route path="/about" component={AboutComponent} />
-          <Route path="/create-task" component={CreateTaskComponent} />
+          <Route path="/task-add" component={AddTaskComponent} />
           
           {/* Displays following component if no other paths match */}
           <Route path="*" component={ErrorComponent} />

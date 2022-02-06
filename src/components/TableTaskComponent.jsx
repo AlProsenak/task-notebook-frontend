@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 // SERVICES
@@ -9,7 +9,7 @@ const TableTaskComponent = () => {
   // STATES
   const [tasks, setTasks] = useState([]);
 
-  // Fetches tasks once on page refresh from given API path.
+  // Fetches tasks once on page refresh from the given API path.
   useEffect(() => {
     getAllTasks();
   }, [])
@@ -30,7 +30,22 @@ const TableTaskComponent = () => {
       }     
     }
   }
-  
+
+  const deleteTask = async (id) => {
+    try {
+      await TaskService.deleteById(id);
+      getAllTasks();
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else {
+        console.log(`Error: ${error.message}`);
+      } 
+    }
+  }
+
   return (
     <div>
       {tasks.length ? (
@@ -61,12 +76,20 @@ const TableTaskComponent = () => {
                 <td>Uncompleted</td>
                 )}
                 
-                <td>{task.deadline}</td>
+                {(task.deadline) ? (
+                  <td>{task.deadline}</td>
+                ) : (
+                  <td>Not given</td>
+                )}
+                
                 <td>{task.description}</td>
                 <td>
                   <button>Completed</button>
                   <button>Edit</button>
-                  <button>Delete</button>
+                  
+                  <button onClick={() => deleteTask(task.id)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -75,13 +98,13 @@ const TableTaskComponent = () => {
         </table>
       ) : (
         <div>
-          <p>Empty task list</p>
-          <p>Add new task</p>
+          <h4>Empty task list</h4>
+          <br/>
         </div>
       )}
 
-      <Link to="/create-task">
-        <button>New task</button>
+      <Link to="/task-add">
+        <button>Add task</button>
       </Link>
     </div>
   );

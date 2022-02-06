@@ -9,8 +9,8 @@ class TaskService {
     return axios.get(TASK_API_URL);
   }
 
-  getById(taskId) {
-    return axios.get(TASK_API_URL + '/' + taskId);
+  getById(id) {
+    return axios.get(TASK_API_URL + '/' + id);
   }
 
   getAllCompleted() {
@@ -23,8 +23,8 @@ class TaskService {
   }
 
   // PUT
-  updateById(taskId, task) {
-    return axios.put(TASK_API_URL + '/' + taskId, task);
+  updateById(id, task) {
+    return axios.put(TASK_API_URL + '/' + id, task);
   }
 
   // DELETE
@@ -32,8 +32,8 @@ class TaskService {
     return axios.delete(TASK_API_URL);
   }
 
-  deleteById(taskId) {
-    return axios.delete(TASK_API_URL + '/' + taskId);
+  deleteById(id) {
+    return axios.delete(TASK_API_URL + '/' + id);
   }
 
   deleteAllCompleted() {
