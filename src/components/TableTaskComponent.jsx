@@ -81,7 +81,7 @@ const TableTaskComponent = () => {
   }
 
   return (
-    <div>
+    <div className="container">
       {tasks.length ? (
         <table className="table table-bordered table-striped">
           
@@ -121,9 +121,14 @@ const TableTaskComponent = () => {
                   <button
                     onClick={() => handleToggleCompleted(task)}
                   >{(task.completed) ? ("Undo") : ("Complete")}</button>
-                  
-                  <button>Edit</button>
-                  
+
+                  <Link 
+                    to={`/task-edit/${task.id}`}
+                    task={task.id}
+                  >
+                    <button>Edit</button>
+                  </Link>
+
                   <button
                     onClick={() => deleteTask(task.id)}
                   >Delete</button>
