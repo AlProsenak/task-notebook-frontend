@@ -6,10 +6,9 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 // COMPONENTS
 import AboutComponent from './components/AboutComponent';
-import AddTaskComponent from './components/AddTaskComponent';
-import EditTaskComponent from './components/EditTaskComponent';
 import ErrorComponent from './components/ErrorComponent';
 import HeaderComponent from './components/HeaderComponent';
+import SubmitTaskComponent from './components/SubmitTaskComponent';
 import TableTaskComponent from './components/TableTaskComponent';
 
 
@@ -22,8 +21,8 @@ function App() {
         <Switch>
           <Route exact path="/" children={<TableTaskComponent />} />
           <Route path="/about" component={AboutComponent} />
-          <Route path="/task-add" component={AddTaskComponent} />
-          <Route path="/task-edit/:id" component={EditTaskComponent} />
+          <Route path="/task-add" component={SubmitTaskComponent} />
+          <Route path="/task-edit/:id" component={SubmitTaskComponent} />
           
           {/* Displays following component if no other paths match */}
           <Route path="*" component={ErrorComponent} />

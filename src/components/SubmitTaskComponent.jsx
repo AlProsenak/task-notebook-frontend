@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import TaskService from '../services/TaskService';
 
 
-const AddTaskComponent = () => {
+const SubmitTaskComponent = (props) => {
   // INITIAL VALUES
   const initialDate = new Date().toISOString().split('T')[0];
   const initialTaskValue = {
@@ -14,13 +14,39 @@ const AddTaskComponent = () => {
   deadline: initialDate,
   description: ''
   }
+  const initialEditMode = (props.match.params.id) ? (true) : (false);
 
   // STATES
   const [task, setTask] = useState(initialTaskValue);
   const [submitted, setSubmitted] = useState(false);
   const [validFields, setValidFields] = useState(false);
+  const [editMode, setEditMode] = useState(initialEditMode);
+
+  // FUNCTIONS
+  const fetchTask = async (id) => {
+    try {
+      const response = await TaskService.getById(id);
+      setTask(response.data);
+      console.log(response.data);
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else {
+        console.log(`Error: ${error.message}`);
+      }     
+    }
+  }
 
   // USE EFFECTS
+  useEffect(() => {
+    console.log(`Edit mode: ${editMode}`);
+
+    // Not my proudest moment, but it works.
+    if (editMode) { fetchTask(props.match.params.id) }; 
+  }, []);
+
   useEffect(() => {
     if ( 
       task.title.trim() === initialTaskValue.title || 
@@ -46,7 +72,8 @@ const AddTaskComponent = () => {
     if (validFields) {
       e.preventDefault();
       
-      TaskService.createNew(task)
+      if (editMode) {
+        TaskService.updateById(task.id, task)
         .then((response) => {
           const { title, accountable, deadline, description} = response.data;
           setTask({
@@ -59,8 +86,37 @@ const AddTaskComponent = () => {
           console.log(response.data);
         })
         .catch((error) => {
-          console.log(error);
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
         });
+      } else {
+        TaskService.createNew(task)
+        .then((response) => {
+          const { title, accountable, deadline, description} = response.data;
+          setTask({
+            title: title,
+            accountable: accountable,
+            deadline: deadline,
+            description: description
+          });
+          setSubmitted(true);
+          console.log(response.data);
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        });
+      }
     } else {
       alert("Title and description are required fields!");
     }
@@ -69,6 +125,7 @@ const AddTaskComponent = () => {
   const handleNewTask = () => {
     setTask(initialTaskValue);
     setSubmitted(false);
+    setEditMode(false);
   }
 
   return (
@@ -77,7 +134,7 @@ const AddTaskComponent = () => {
         <div>
           <h4>Task submitted successfully!</h4>
           <br/>
-          <button onClick={handleNewTask}>Add another</button>
+          <button onClick={handleNewTask}>Add new</button>
           <Link to="/">
             <button>Return</button>
           </Link>
@@ -87,7 +144,7 @@ const AddTaskComponent = () => {
           className = "card col-md-6 offset-md-3 offset-md-3"
         >
           <br/>
-          <h4>New Task</h4>
+          <h4>{(editMode ? "Edit Task" : "New Task")}</h4>
           <form>
             <div className="form-group">
               <label>Title</label>
@@ -140,7 +197,7 @@ const AddTaskComponent = () => {
             </div>
 
             <button 
-              onClick={(e) => handleSubmitTask(e)}
+              onClick={handleSubmitTask}
               type="submit"
             >Submit</button>
 
@@ -155,4 +212,4 @@ const AddTaskComponent = () => {
   );
 }
 
-export default AddTaskComponent;
+export default SubmitTaskComponent;

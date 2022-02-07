@@ -50,7 +50,7 @@ const TableTaskComponent = () => {
     }
   }
 
-  const deleteTask = async (id) => {
+  const handleDeleteTask = async (id) => {
     try {
       await TaskService.deleteById(id);
       fetchTaskList();
@@ -122,15 +122,12 @@ const TableTaskComponent = () => {
                     onClick={() => handleToggleCompleted(task)}
                   >{(task.completed) ? ("Undo") : ("Complete")}</button>
 
-                  <Link 
-                    to={`/task-edit/${task.id}`}
-                    task={task.id}
-                  >
+                  <Link to={`/task-edit/${task.id}`}>
                     <button>Edit</button>
                   </Link>
 
                   <button
-                    onClick={() => deleteTask(task.id)}
+                    onClick={() => handleDeleteTask(task.id)}
                   >Delete</button>
                 </td>
               </tr>
