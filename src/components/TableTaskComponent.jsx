@@ -8,19 +8,46 @@ import TaskService from '../services/TaskService';
 const TableTaskComponent = () => {
   // STATES
   const [tasks, setTasks] = useState([]);
+  const [completeFlag, setCompleteFlag] = useState("all");
 
   // USE EFFECTS
   useEffect(() => {
-    fetchTaskList();
+    fetchTaskList("all");
   }, [])
 
-  // EVENT HANDLERS
-  const fetchTaskList = async () => {
-    try {
-      const response = await TaskService.getAll();
+  // FUNCTIONS
+  const getResponseDataByCompletion = (showCompleted) => {
+    setCompleteFlag(showCompleted);
+
+    if (showCompleted === "all") {
+      const response = TaskService.getAll();
+      return response;
+    } else if (showCompleted === "completed") {
+      const response = TaskService.getAllCompleted(true);
+      return response;
+    } else if (showCompleted === "uncompleted") {
+      const response = TaskService.getAllCompleted(false);
+      return response;
+    } else {
+      throw new Error("Error at getResponseDataByCompletion")
+    }
+  }
+
+  const checkForResponseData = (response) => {
+    if (response.data) {
       setTasks(response.data.sort(
         (a, b) => (a.id - b.id)
       ));
+    } else {
+      setTasks([]);
+    }
+  }
+
+  // EVENT HANDLERS
+  const fetchTaskList = async (showCompleted) => {
+    try {
+      const response = await getResponseDataByCompletion(showCompleted);
+      checkForResponseData(response);
       console.log(response.data);
     } catch (error) {
       if (error.response) {
@@ -36,9 +63,18 @@ const TableTaskComponent = () => {
   const handleToggleCompleted = async (task) => {
     try {
       (task.completed) ? (task.completed = false) : (task.completed = true);
-
       await TaskService.updateById(task.id, task);
-      fetchTaskList();
+      switch (completeFlag) {
+        case "all":
+        fetchTaskList(completeFlag);
+        break;
+        case "completed":
+        fetchTaskList(completeFlag);
+        break;
+        case "uncompleted":
+        fetchTaskList(completeFlag);
+        break;
+      }
     } catch (error) {
       if (error.response) {
         console.log(error.response.data);
@@ -50,25 +86,20 @@ const TableTaskComponent = () => {
     }
   }
 
-  const handleDeleteTask = async (id) => {
+  const handleDeleteTasks = async (id = null, completed = null) => {
     try {
-      await TaskService.deleteById(id);
-      fetchTaskList();
-    } catch (error) {
-      if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+      if (id) {
+        await TaskService.deleteById(id);
+      } else
+      if (completed) {
+        await TaskService.deleteAllCompleted(completed);
+      } else 
+      if (!id && !completed) {
+        await TaskService.deleteAll();
       } else {
-        console.log(`Error: ${error.message}`);
-      } 
-    }
-  }
-
-  const handleDeleteCompleted = async () => {
-    try {
-      await TaskService.deleteAllCompleted();
-      fetchTaskList();
+        throw new Error("Error at handleDeleteTasks");
+      }
+      fetchTaskList("all");
     } catch (error) {
       if (error.response) {
         console.log(error.response.data);
@@ -127,7 +158,7 @@ const TableTaskComponent = () => {
                   </Link>
 
                   <button
-                    onClick={() => handleDeleteTask(task.id)}
+                    onClick={() => handleDeleteTasks(task.id)}
                   >Delete</button>
                 </td>
               </tr>
@@ -138,15 +169,23 @@ const TableTaskComponent = () => {
       ) : (
         <div>
           <h4>Empty task list</h4>
-          <br/>
+          <br />
         </div>
       )}
 
       <Link to="/task-add">
         <button>Add task</button>
-      </Link>
-
-      <button onClick={handleDeleteCompleted}>Delete completed</button>
+      </Link><br /><br />
+      <div>
+        <button onClick={() => fetchTaskList("completed")}>Show completed</button>
+        <button onClick={() => fetchTaskList("uncompleted")}>Show uncompleted</button>
+        <button onClick={() => fetchTaskList("all")}>Show all</button>
+      </div><br />
+      <div>
+        <button onClick={() => handleDeleteTasks(...[,], true)}>Delete completed</button>
+        <button onClick={() => handleDeleteTasks(...[,], false)}>Delete uncompleted</button>
+        <button onClick={() => handleDeleteTasks()}>Delete all</button>
+      </div>
     </div>
   );
 }

@@ -13,8 +13,8 @@ class TaskService {
     return axios.get(TASK_API_URL + '/' + id);
   }
 
-  getAllCompleted() {
-    return axios.get(TASK_API_URL + '/completed');
+  getAllCompleted(completed) {
+    return axios.get(TASK_API_URL + `/completed-${completed}`);
   }
 
   // POST
@@ -36,8 +36,8 @@ class TaskService {
     return axios.delete(TASK_API_URL + '/' + id);
   }
 
-  deleteAllCompleted() {
-    return axios.delete(TASK_API_URL + '/completed');
+  deleteAllCompleted(completed) {
+    return axios.delete(TASK_API_URL + `/completed-${completed}`);
   }
 }
 
